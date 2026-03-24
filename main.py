@@ -1,6 +1,15 @@
-def main():
-    print("Hello from multi-agent-scouting-system!")
+from agents.planner import PlannerAgent
 
+team = {
+    "name": "My Team",
+    "players": [
+        {"name": "Player1", "role": "Forward", "score": 90},
+        {"name": "Player2", "role": "Midfielder", "score": 60},
+        {"name": "Player3", "role": "Defender", "score": 70},
+    ]
+}
 
-if __name__ == "__main__":
-    main()
+planner = PlannerAgent()
+result = planner.run(team)
+
+print(result)
