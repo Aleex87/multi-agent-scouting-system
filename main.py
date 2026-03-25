@@ -8,8 +8,9 @@ def human_decision(plan, candidate):
     print(f"Target role: {plan['target_role']}")
 
     print("\nSuggested replacement:")
-    print(candidate)
-
+    print(f"Name: {candidate['name']}")
+    print(f"Role: {candidate['role']}")
+    print(f"Value: {candidate['value']}")
     decision = input("\nDo you accept this player? (y/n): ")
     return decision.lower() == "y"
 

@@ -30,4 +30,6 @@ Return ONLY a JSON object with:
 - candidate (name, role, value)
 - reason
 the output has to be exactly that becouse is that format that the next agent aspect to recive 
+Do NOT include any text before or after the JSON.
+Do NOT use markdown or code blocks.
 </OUTPUT>

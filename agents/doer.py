@@ -1,35 +1,72 @@
 from utils.logger import log
-import random
+from utils.models import get_model
+import re
+import json
+
 
 class DoerAgent:
-    def run(self, plan: dict) -> dict:
-        log("Doer: searching for candidate player")
+    def __init__(self):
+        self.model = get_model()
 
-        # handoff between agents
+    def run(self, plan: dict) -> dict:
+        log("Doer: searching for candidate player using LLM")
+
+        
         target_role = plan["target_role"]
 
-        # fake market with players
-        fake_market = [
-            {"name": "Player A", "role": "Midfielder", "value": 80},
-            {"name": "Player B", "role": "Midfielder", "value": 75},
-            {"name": "Player C", "role": "Defender", "value": 85},
-            {"name": "Player D", "role": "Forward", "value": 90},
-            {"name": "Player E", "role": "Midfielder", "value": 82},
-        ]
+        prompt = f"""
+You are a scouting agent.
 
-        # filter by role 
-        candidates = [p for p in fake_market if p["role"] == target_role]
+Task:
+Find a suitable player for the following role: {target_role}
 
-        if not candidates:
-            log("Doer: no candidates found for role")
-            return None
+Requirements:
+- The player should fit the role
+- Assign a value between 60 and 100
+- The player can be real or fictional
 
-        candidate = random.choice(candidates)
+Output:
+Return ONLY a valid JSON object like:
+{{
+  "candidate": {{
+    "name": "...",
+    "role": "...",
+    "value": ...
+  }},
+  "reason": "..."
+}}
+"""
 
-        result = {
-            "candidate": candidate,
-            "reason": "Selected based on role match and simulated evaluation"
-        }
+        try:
+            response = self.model.invoke(prompt)
+            content = response.content
 
-        log(f"Doer result: {result}")
-        return result
+            log(f"LLM raw output: {content}")
+
+            # Extract JSON block from response
+            json_match = re.search(r"\{.*\}", content, re.DOTALL)
+
+            if not json_match:
+                raise ValueError("No JSON found in LLM response")
+
+            json_str = json_match.group()
+
+            parsed = json.loads(json_str)
+
+            log(f"Doer result (LLM): {parsed}")
+            return parsed
+
+        except Exception as e:
+            log(f"Doer error: {e}")
+
+            return {
+                "candidate": {
+                    "name": "Fallback Player",
+                    "role": target_role,
+                    "value": 70
+                },
+                "reason": "Fallback due to LLM error"
+            }
+
+        # Originally implemented as a deterministic stub during system design.
+        # This component has been upgraded to use an LLM for candidate generation.
