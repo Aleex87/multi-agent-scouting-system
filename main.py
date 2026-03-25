@@ -1,3 +1,6 @@
+from utils.models import get_model
+import json
+import re
 from orchestrator.workflow import Workflow
 from utils.logger import log
 
@@ -15,15 +18,69 @@ def human_decision(plan, candidate):
     return decision.lower() == "y"
 
 
+def generate_team_from_llm(team_name: str) -> dict:
+    model = get_model()
+
+    prompt = f"""
+You are a sports data generator.
+
+Task:
+Generate a realistic team for: {team_name}
+
+Requirements:
+- Include 5 to 8 players
+- Each player must have:
+  - name
+  - role (Forward, Midfielder, Defender)
+  - score (integer between 60 and 100)
+
+Output:
+Return ONLY a valid JSON object like:
+{{
+  "name": "{team_name}",
+  "players": [
+    {{
+      "name": "...",
+      "role": "...",
+      "score": ...
+    }}
+  ]
+}}
+
+Do NOT include any text before or after the JSON.
+Do NOT use markdown or code blocks.
+"""
+
+    try:
+        response = model.invoke(prompt)
+        content = response.content
+
+        # Extract JSON
+        json_match = re.search(r"\{.*\}", content, re.DOTALL)
+
+        if not json_match:
+            raise ValueError("No JSON found in LLM response")
+
+        json_str = json_match.group()
+
+        team = json.loads(json_str)
+
+        return team
+
+    except Exception as e:
+        print(f"Team generation error: {e}")
+
+        # Fallback minimal
+        return {
+            "name": team_name,
+            "players": [
+                {"name": "Fallback Player", "role": "Midfielder", "score": 70}
+            ]
+        }
+
 if __name__ == "__main__":
-    team = {
-        "name": "My Team",
-        "players": [
-            {"name": "Player1", "role": "Forward", "score": 90},
-            {"name": "Player2", "role": "Midfielder", "score": 60},
-            {"name": "Player3", "role": "Defender", "score": 70},
-        ]
-    }
+    team_name = input("Enter team name: ")
+    team = generate_team_from_llm(team_name)
 
     workflow = Workflow()
     result = workflow.run(team)
