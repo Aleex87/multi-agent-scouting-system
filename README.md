@@ -1,5 +1,46 @@
 # multi-agent-scouting-system
 
+## Quick Start
+
+### 1. Clone the repository
+```bash
+git clone <your-repo-url>
+cd multi-agent-scouting-system
+```
+
+### 2. Install dependencies (using uv)
+```bash
+uv sync
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the root directory and add:
+
+```env
+OLLAMA_BASE_URL=your_base_url
+OLLAMA_BEARER_TOKEN=your_token
+```
+
+### 4. Run the application
+```bash
+uv run python main.py
+```
+
+You will be prompted to enter a team name:
+
+```bash
+Enter team name: Juventus
+```
+
+The system will:
+- Generate a team using an LLM
+- Analyze weaknesses
+- Suggest a replacement player
+- Ask for human approval
+
+---
+
 ## Project Overview
 
 This project implements a **multi-agent workflow for sports scouting**, designed to analyze a team and suggest potential player replacements or improvements.
@@ -15,12 +56,45 @@ The implementation focuses on:
 
 ---
 
+## Key Features
+
+- **Multi-Agent Architecture**
+  - Planner, Doer, and Critic agents with clear responsibilities
+
+- **Hybrid AI System**
+  - Deterministic logic (Planner & Critic)
+  - LLM-based reasoning (Doer and team generation)
+
+- **End-to-End Workflow**
+  - From user input (team name) to final human decision
+
+- **Structured Agent Communication**
+  - JSON-based handoffs between agents
+
+- **LLM Integration**
+  - Candidate generation powered by Ollama
+  - Synthetic team data generation from natural language input
+
+- **Robust JSON Parsing**
+  - Handles non-deterministic LLM outputs safely
+
+- **Controlled Iteration Loop**
+  - Prevents infinite loops and reduces computational cost
+
+- **Human-in-the-Loop**
+  - Final decision always requires human approval
+
+- **Logging & Traceability**
+  - Full visibility into agent decisions and workflow execution
+
+---
+
 ## Core Architecture: Planner – Doer – Critic
 
 The system follows the **Planner–Doer–Critic pattern**, where each agent has a clearly defined role:
 
 - **Planner** → analyzes the team and identifies needs  
-- **Doer** → finds a potential player candidate  
+- **Doer** → finds a potential player candidate using an LLM  
 - **Critic** → validates the candidate  
 - **Human-in-the-Loop** → makes the final decision  
 
@@ -36,8 +110,12 @@ This separation of concerns improves:
 ### 1. Input
 
 The scout provides:
-- A team (their own or another team)
-- Players, positions, and basic performance data
+- A team name (e.g. "Juventus")
+
+The system uses an LLM to generate a structured team dataset, including:
+- Players
+- Roles
+- Performance scores
 
 ---
 
@@ -64,7 +142,7 @@ The Doer receives the requirements and searches for a suitable candidate.
 Responsibilities:
 - Identify a player that fits the required role
 - Estimate the potential value added to the team
-- Optionally simulate reasoning using an LLM
+- Generate candidates using an LLM
 
 Output:
 - Candidate player name
@@ -82,9 +160,8 @@ Output:
 The Critic validates the proposed candidate.
 
 Responsibilities:
-- Verify that the player exists
-- Check if the player is available (simulated market logic)
-- Estimate cost or feasibility
+- Verify that the player is suitable
+- Check if the candidate meets minimum value criteria
 - Evaluate if the suggestion makes sense
 
 If the candidate is **not valid**:
@@ -105,7 +182,7 @@ Purpose:
 - Prevent infinite or expensive processing
 
 Constraint:
-- Maximum number of iterations is limited (e.g. number of players in the team)
+- Maximum number of iterations is limited to the number of players in the team
 
 Each iteration is:
 - Logged
@@ -120,8 +197,7 @@ Before any final action, a human decision is required.
 The scout can:
 - Accept the suggestion
 - Reject it
-- Save it for later
-- Take action (e.g. initiate a transfer)
+- Ignore the result and run again
 
 The process is only considered complete after human validation.
 
@@ -172,7 +248,7 @@ Any action with real-world impact requires:
 ### 6. Separation of Concerns
 Each agent has a single responsibility:
 - Planner → analysis
-- Doer → execution
+- Doer → execution (LLM-powered)
 - Critic → validation
 
 This reduces:
@@ -188,7 +264,18 @@ This project demonstrates how a conceptual **multi-agent workflow** can be trans
 
 - Structuring agents with clear roles
 - Designing explicit input/output handoffs
+- Integrating LLMs for non-deterministic reasoning
 - Adding logging and safety constraints
 - Including human oversight
 
 The focus is not on model accuracy, but on building a **clean, testable, and extensible multi-agent system**.
+
+---
+
+## Final Note
+
+This project showcases how multi-agent systems can be designed with a balance of deterministic control and LLM-based reasoning, ensuring both flexibility and reliability.
+
+## Author 
+
+Alessandro Abbate
