@@ -1,5 +1,6 @@
 from agents.planner import PlannerAgent
 from agents.doer import DoerAgent
+from agents.critic import CriticAgent
 
 team = {
     "name": "My Team",
@@ -12,8 +13,10 @@ team = {
 
 planner = PlannerAgent()
 doer = DoerAgent()
+critic = CriticAgent()
 
 plan = planner.run(team)
 candidate = doer.run(plan)
+review = critic.run(candidate)
 
-print(candidate)
+print(review)
