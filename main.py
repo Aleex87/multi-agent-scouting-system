@@ -1,5 +1,7 @@
 from agents.planner import PlannerAgent
 
+# test logger
+
 team = {
     "name": "My Team",
     "players": [

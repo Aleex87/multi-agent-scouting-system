@@ -1,5 +1,7 @@
 from utils.logger import log
 
+# Agent 1
+
 class PlannerAgent:
     def run(self, team: dict) -> dict:
         log("Planner: analyzing team")
