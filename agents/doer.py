@@ -5,6 +5,7 @@ class DoerAgent:
     def run(self, plan: dict) -> dict:
         log("Doer: searching for candidate player")
 
+        # handoff between agents
         target_role = plan["target_role"]
 
         # fake market with players

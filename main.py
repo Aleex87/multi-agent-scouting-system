@@ -1,6 +1,5 @@
 from agents.planner import PlannerAgent
-
-# test logger
+from agents.doer import DoerAgent
 
 team = {
     "name": "My Team",
@@ -12,6 +11,9 @@ team = {
 }
 
 planner = PlannerAgent()
-result = planner.run(team)
+doer = DoerAgent()
 
-print(result)
+plan = planner.run(team)
+candidate = doer.run(plan)
+
+print(candidate)
