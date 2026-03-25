@@ -55,6 +55,10 @@ The implementation focuses on:
 - Safe and controlled execution (guardrails)
 
 ---
+## Workflow Diagram
+
+Workflow Diagram in:
+docs/diagram.png
 
 ## Key Features
 
